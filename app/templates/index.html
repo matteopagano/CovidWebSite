@@ -1,0 +1,1172 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!doctype html>
+<html>
+    <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+            <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+            <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js" integrity="sha384-VHvPCCyXqtD5DqJeNxl2dtTyhF78xXNXdkwX1CZeRusQfRKp+tA7hAShOK/B/fQ2" crossorigin="anonymous"></script>
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4733549329871811" crossorigin="anonymous"></script><style>
+            </style>
+    </head>
+    <body style="background-color: #f3ecccc1">
+        <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">Covid19-Center</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#graphs">Grafici</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#dati">Dati</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-expanded="false">Tabelle</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#ordinari">Reparti ordinari</a>
+                            <a class="dropdown-item" href="#intensive">Terapie intensive</a>
+                        </div>
+                    </li>
+                <!--<li class="nav-item">
+                  <a class="nav-link disabled">Disabled</a>
+                </li>
+                -->
+                </ul>
+
+            </div>
+        </nav>
+
+        <div class="jumbotron text-center" style=" background-image: url({{url_for('static', filename='covid.jpg')}}); background-size: 100%;">
+
+            <br>
+            <br>
+            <h1 style="font-family: Garamond, serif"><mark>Covid in Italia</mark></h1>
+            <p class="font-italic" " ><mark>Dati quotidiani sul covid in Italia, aggiornato al:</mark></p>
+            <p class="font-italic text-secondary"><span style="background-color:powderblue;"><mark>{{obj.data.giorno}}/{{obj.data.mese}}/{{obj.data.anno}}</mark></p>
+        </div>
+
+
+
+
+
+
+        <div class="container" id="dati">
+            <div class="row" style="text-align:center;">
+                <div class="col-sm-6">
+                    <h1 class="display-4" style="font-family: Garamond, serif" >Dati generali Covid-19</h1>
+                </div>
+                <div class="col-sm-6">
+                </div>
+            </div>
+            <br>
+            <br>
+            <div class="row" style="text-align:center;">
+                <div class="col-sm-3">
+                    <br>
+                    <h5 class="text-danger" style="font-family: 'Trebuchet MS', sans-serif;"><strong>Nuovi Casi</strong></h3>
+                    <p class="text-danger"><h1 class="display-4" style="text-align:center;">+ {{'{0:,}'.format(obj.oggi.nuovi_positivi)}}</h2></p>
+                    <p class="text-danger" style="text-align:center;">+ <kbd>{{(((obj.oggi.nuovi_positivi-obj.unaSettimanaFa.nuovi_positivi)/obj.unaSettimanaFa.nuovi_positivi)*100 )|round(2)}}%</kbd><span class="font-italic text-secondary"> rispetto ad una settimana fa</span></p>
+                    <p class="text-danger" style="text-align:center;"><h6>Totali {{'{0:,}'.format(obj.oggi.totale_casi)}}</h6></p>
+                    <br>
+
+                </div>
+                <div class="col-sm-3" >
+                    <br>
+                    <h5 style="font-family: 'Trebuchet MS', sans-serif;"><strong>Deceduti</strong></h6>
+                    <p class="text-danger"><h1 class="display-4">+ {{'{0:,}'.format(obj.oggi.deceduti - obj.ieri.deceduti)}}</h4></p>
+                    <p class="text-danger" style="text-align:center;">+ <kbd>{{(((obj.oggi.deceduti-obj.unaSettimanaFa.deceduti)/obj.unaSettimanaFa.deceduti)*100 )|round(2)}}%</kbd><span class="font-italic text-secondary"> rispetto ad una settimana fa</span></p>
+                    <p class="text-danger"><h6>Totali {{'{0:,}'.format(obj.oggi.deceduti)}}</h6></p>
+                    <br>
+
+                </div>
+                <div class="col-sm-3">
+                    <br>
+                    <h5 style="color:rgb(217, 174, 0); font-family: 'Trebuchet MS', sans-serif; "><strong>Ricoverati in terapia intensiva</strong></h6>
+                    <p class="text-danger"><h1 class="display-4">{{'{0:,}'.format(obj.oggi.terapia_intensiva)}}</h4></p>
+                    <p class="text-danger" style="text-align:center;">+ <kbd>{{'{0:,}'.format(obj.oggi.terapia_intensiva-obj.ieri.terapia_intensiva)}}</kbd> <span class="font-italic text-secondary">rispetto alla data di ieri</span></p>
+                    <p class="text-danger" style="text-align:center;">+ <kbd>{{(((obj.oggi.terapia_intensiva-obj.unaSettimanaFa.terapia_intensiva)/obj.unaSettimanaFa.terapia_intensiva) * 100)|round(2)}}%</kbd> <span class="font-italic text-secondary"> rispetto ad una settimana fa</span></p>
+
+                    <br>
+                </div>
+                <div class="col-sm-3">
+                    <br>
+                    <h5 style="color:rgb(217, 174, 0); font-family: 'Trebuchet MS', sans-serif;"><strong>Ricoverati con sintomi</strong></h6>
+                    <p class="text-danger"><h1 class="display-4">{{'{0:,}'.format(obj.oggi.ricoverati_con_sintomi)}}</h4></p>
+                    <p class="text-danger" style="text-align:center;">+ <kbd>{{'{0:,}'.format(obj.oggi.ricoverati_con_sintomi - obj.ieri.ricoverati_con_sintomi)}}</kbd> <span class="font-italic text-secondary">rispetto alla data di ieri</span></p>
+                    <p class="text-danger" style="text-align:center;">+ <kbd>{{(((obj.oggi.ricoverati_con_sintomi-obj.unaSettimanaFa.ricoverati_con_sintomi)/obj.unaSettimanaFa.ricoverati_con_sintomi) * 100)|round(2)}}%</kbd> <span class="font-italic text-secondary"> rispetto ad una settimana fa</span></p>
+
+                    <br>
+                </div>
+            </div>
+
+            <br>
+            <hr>
+            <br>
+
+            <div class="row" style="text-align:center;">
+                <div class="col-sm-4">
+                    <br>
+                    <h5 style="color:rgb(217, 174, 0); font-family: 'Trebuchet MS', sans-serif;"><strong>Attualmente in isolamento domicialiare</strong></h3>
+                    <p class="text-danger"><h1 class="display-4">{{'{0:,}'.format(obj.oggi.isolamento_domiciliare)}} <span class="font-italic text-secondary"><h6>(dato cumulativo)</h6></span></h4></p>
+                    <p class="text-danger" style="text-align:center;">+ <kbd>{{'{0:,}'.format(obj.oggi.isolamento_domiciliare - obj.ieri.isolamento_domiciliare)}}</kbd> <span class="font-italic text-secondary">rispetto alla data di ieri</span></p>
+                    <p class="text-danger" style="text-align:center;">+ <kbd>{{(((obj.oggi.isolamento_domiciliare-obj.unaSettimanaFa.isolamento_domiciliare)/obj.unaSettimanaFa.isolamento_domiciliare) * 100)|round(2)}}%</kbd> <span class="font-italic text-secondary"> rispetto ad una settimana fa</span></p>
+
+                    <br>
+
+                </div>
+                <div class="col-sm-4" >
+                    <br>
+                    <h5 class="text-success" style="font-family: 'Trebuchet MS', sans-serif;"><strong>Dimessi o Guariti</strong></h6>
+                    <p class="text-danger"><h1 class="display-4">+ {{'{0:,}'.format(obj.oggi.dimessi_guariti - obj.ieri.dimessi_guariti)}}</h4></p>
+
+                    <p class="text-danger"><h4> {{'{0:,}'.format(obj.oggi.dimessi_guariti)}} <span class="font-italic text-secondary"><h6>(dato cumulativo)</h6></span></h4></p>
+                    <br>
+
+                </div>
+                <div class="col-sm-4">
+                    <br>
+                    <h5 style="color:rgb(217, 174, 0); font-family: 'Trebuchet MS', sans-serif;"><strong>Attualmente positivi</strong></h6>
+                    <p class="text-danger"><h1 class="display-4">{{'{0:,}'.format(obj.oggi.totale_positivi)}} <span class="font-italic text-secondary"><h6>(dato cumulativo)</h6></span></h4></p>
+                    <p class="text-danger" style="text-align:center;">+ <kbd>{{'{0:,}'.format(obj.oggi.totale_positivi-obj.ieri.totale_positivi)}}</kbd> <span class="font-italic text-secondary">rispetto alla data di ieri</span></p>
+                    <p class="text-danger" style="text-align:center;">+ <kbd>{{(((obj.oggi.totale_positivi-obj.unaSettimanaFa.totale_positivi)/obj.unaSettimanaFa.totale_positivi) * 100)|round(2)}}%</kbd> <span class="font-italic text-secondary"> rispetto ad una settimana fa</span></p>
+
+                    <br>
+
+                </div>
+            </div>
+
+            <br>
+            <hr>
+            <br>
+
+            <div class="container">
+                <div class="row" style="text-align:center;">
+
+                    <div class="col-sm-2">
+                    </div>
+                    <div class="col-sm-8">
+                        <p>
+                            <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                Premi per visualizzare gli ultimi report delle regioni
+                            </a>
+                        </p>
+                        <div class="collapse" id="collapseExample">
+                            <div class="card card-body">
+                                <hr>
+                                {%for text in obj.note%}
+                                    {{text.data}}: {{text.note}}.
+                                    <br>
+                                    <hr>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                    </div>
+                </div>
+
+            </div>
+            <br>
+            <hr>
+
+              <br>
+              <br>
+              <br>
+
+            <div class="container" id="graphs">
+                <div class="row">
+                    <div class="col-sm-2">
+
+                    </div>
+                    <div class="col-sm-4">
+                        <h1 class="display-4" style="font-family: Garamond, serif">Grafici</h1>
+
+                    </div>
+                    <div class="col-sm-6">
+
+                    </div>
+                </div>
+
+
+            </div>
+
+            <br>
+            <br>
+            <br>
+
+            <div class="container">
+                <div class="container" >
+                    <div class="row" style="text-align:center;">
+                        <div class="col-sm-2">
+
+                        </div>
+                        <div class="col-sm-8">
+                            <h3>Variazione casi su base mensile (a livello nazionale).</h3>
+                            <br>
+                            Il grafico evidenzia la variazione dei contagi giornalieri, ogni punto mostra il numero di positivi complessivi nel corrispondente giorno.
+                            <br>
+                            <br>
+                            <canvas id="attualmentePositivi" width="900" height="600"></canvas>
+                        </div>
+                        <div class="col-sm-2">
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <br>
+                <br>
+                <hr>
+
+                <br>
+                <br>
+                <div class="container">
+                    <div class="row" style="text-align:center;">
+                        <div class="col-sm-2">
+
+                        </div>
+                        <div class="col-sm-8">
+                            <h3>Dettaglio positività per regione</h3>
+                            <br>
+                            Il grafico elenca le regioni italiane (in ordine alfabetico) con il rispettivo numero di positivi totale in data {{obj.data.giorno}}/{{obj.data.mese}}
+                            <br>
+                            <br>
+
+                            <canvas id="AttualmentepositiviPerRegione" width="1000" height="800"></canvas>
+                        </div>
+                        <div class="col-sm-2">
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <br>
+                <br>
+                <hr>
+
+                <br>
+                <br>
+                <div class="container">
+                    <div class="row" style="text-align:center;">
+                        <div class="col-sm-2">
+
+                        </div>
+                        <div class="col-sm-8">
+                            <h3>Indice di positività rispetto ai tamponi molecolari effettuati</h3>
+                            <br>
+                            Il grafico mette in evidenzia il rapporto tra le persone testate con tampone molecolare (<mark>linea verde</mark>) e persone trovate positive con tampone molecolare (<mark>linea rossa</mark>).
+                                <br>
+                            <br>
+
+                            <canvas id="testMolecolari" width="1000" height="800"></canvas>
+                        </div>
+                        <div class="col-sm-2">
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <br>
+                <br>
+                <hr>
+
+
+                <br>
+                <br>
+
+                <div class="container">
+                    <div class="row" style="text-align:center;">
+                        <div class="col-sm-1">
+
+                        </div>
+                        <div class="col-sm-10">
+                            <h3>Relazione tra vaccini consegnati e vaccini somministrati (per regione)</h3>
+                            <br>
+                            Il grafico mette in evidenzia il rapporto tra i vaccini consegnati alle varie regioni (<mark>verde</mark>) e il totale delle dosi somministrate (<mark>rossa</mark>).
+                                <br>
+                            <br>
+
+                            <canvas id="vax" width="1000" height="800"></canvas>
+                        </div>
+                        <div class="col-sm-1">
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <br>
+                <br>
+                <hr>
+
+
+                <br>
+                <br>
+
+                <div class="container" id="ordinari">
+                    <div class="row" style="text-align:center;">
+                        <div class="col-sm-2">
+
+                        </div>
+                        <div class="col-sm-8">
+                            <h3>Livello di saturazione dei reparti ordinari</h3>
+                            <br>Questa tabella mette in evidenza i posti occupati in <strong>area non critica</strong> da pazienti Covid per regione. Secondo le nuove regole per i passaggi tra zona bianca, gialla, arancione o rossa uno dei criteri è il superamento del 15, 30, 40% <br>
+                            <br>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Regione</th>
+                                            <th>Ric. con sintomi</th>
+                                            <th>Quota occupazione %</th>
+                                            <th>%</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for item in obj.andamentoRegioniLast %}
+                                        <tr>
+                                            <td class="py-1">
+                                                {{ item["denominazione_regione"] }}
+                                            </td>
+                                            <td>
+                                                {{ item["ricoverati_con_sintomi"] }}
+                                            </td>
+                                            <td>
+                                                <div class="progress">
+                                                  <div class="progress-bar" role="progressbar" style="width:
+                                                        {% if item["denominazione_regione"] == "Abruzzo" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/1382)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/1382) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/1382)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/1382)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/1382)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/1382)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/1382)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Basilicata" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/362)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/362) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/362)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/362)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/362)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/362)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/362)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Calabria" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/1002)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/1002) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/1002)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/1002)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/1002)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/1002)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/1002)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Campania" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/3899)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/3899) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/3899)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/3899)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/3899)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/3899)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/3899)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Emilia-Romagna" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/9001)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/9001) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/9001)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/9001)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/9001)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/9001)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/9001)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+
+                                                        {% elif item["denominazione_regione"] == "Friuli Venezia Giulia" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/1277)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/1277) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/1277)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/1277)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/1277)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/1277)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/1277)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Lazio" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/6421)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/6421) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/6421)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/6421)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/6421)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/6421)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/6421)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Liguria" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/1649)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/1649) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/1649)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/1649)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/1649)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/1649)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/1649)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Lombardia" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/10457)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/10457) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/10457)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/10457)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/10457)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/10457)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/10457)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Marche" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/983)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/983) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/983)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/983)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/983)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/983)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/983)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+
+                                                        {% elif item["denominazione_regione"] == "Molise" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/176)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/176) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/176)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/176)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/176)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/176)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/176)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "P.A. Bolzano" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/500)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/500) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/500)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/500)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/500)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/500)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/500)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "P.A. Trento" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/517)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/517) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/517)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/517)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/517)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/517)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/517)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Piemonte" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/6794)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/6794) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/6794)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/6794)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/6794)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/6794)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/6794)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Puglia" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/2736)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/2736) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/2736)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/2736)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/2736)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/2736)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/2736)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+
+                                                        {% elif item["denominazione_regione"] == "Sardegna" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/1602)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/1602) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/1602)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/1602)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/1602)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/1602)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/1602)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Sicilia" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/3644)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/3644) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/3644)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/3644)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/3644)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/3644)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/3644)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Toscana" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/5033)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/5033) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/5033)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/5033)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/5033)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/5033)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/5033)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Umbria" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/662)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/662) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/662)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/662)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/662)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/662)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/662)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Valle d'Aosta" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/85)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/85) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/85)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/85)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/85)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/85)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/85)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Veneto" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/6000)|round(1) }}%;
+                                                            {% if (((item["ricoverati_con_sintomi"]*100)/6000) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/6000)|round(1) >=15 and ((item["ricoverati_con_sintomi"]*100)/6000)|round(1) < 30 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/6000)|round(1) >=30 and ((item["ricoverati_con_sintomi"]*100)/6000)|round(1) < 40 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["ricoverati_con_sintomi"]*100)/6000)|round(1) >=40  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% endif %}
+                                                        " aria-valuenow="" aria-valuemin="0" aria-valuemax="100"
+
+                                                  ></div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {% if item["denominazione_regione"] == "Abruzzo" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/1382)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Basilicata" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/362)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Calabria" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/1002)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Campania" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/3899)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Emilia-Romagna" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/9001)|round(1) }}%
+
+                                                        {% elif item["denominazione_regione"] == "Friuli Venezia Giulia" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/1277)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Lazio" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/6421)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Liguria" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/1649)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Lombardia" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/10457)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Marche" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/983)|round(1) }}%
+
+                                                        {% elif item["denominazione_regione"] == "Molise" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/176)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "P.A. Bolzano" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/500)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "P.A. Trento" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/517)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Piemonte" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/6794)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Puglia" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/2736)|round(1) }}%
+
+                                                        {% elif item["denominazione_regione"] == "Sardegna" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/1602)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Sicilia" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/3644)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Toscana" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/5033)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Umbria" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/662)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Valle d'Aosta" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/85)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Veneto" %}
+                                                            {{ ((item["ricoverati_con_sintomi"]*100)/6000)|round(1) }}%
+                                                        {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                        </div>
+                        <div class="col-sm-2">
+
+                        </div>
+                    </div>
+                </div>
+
+                <br>
+                <br>
+                <hr>
+                <br>
+                <br>
+
+                <div class="container" id="intensive">
+                    <div class="row" style="text-align:center;">
+                        <div class="col-sm-2">
+
+                        </div>
+                        <div class="col-sm-8">
+                            <h3>Livello di saturazione dei reparti di terapia intensiva</h3>
+                            <br>Questa tabella mette in evidenza i posti occupati in <strong>terapia intensiva</strong> da pazienti Covid per regione. Secondo le nuove regole per i passaggi tra zona bianca, gialla, arancione o rossa uno dei criteri è il superamento del 10, 20, 30% dei posti disponibili nella regione. <br>
+                            <br>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Regione</th>
+                                            <th>Ric. Terapia Intensiva</th>
+                                            <th>Quota occupazione</th>
+                                            <th>%</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for item in obj.andamentoRegioniLast %}
+                                        <tr>
+                                            <td class="py-1">
+                                                {{ item["denominazione_regione"] }}
+                                            </td>
+                                            <td>
+                                                {{ item["terapia_intensiva"] }}
+                                            </td>
+                                            <td>
+                                                <div class="progress">
+                                                  <div class="progress-bar" role="progressbar" style="width:
+                                                        {% if item["denominazione_regione"] == "Abruzzo" %}
+                                                        {{ ((item["terapia_intensiva"]*100)/181)|round(1) }}%;
+                                                        {% if (((item["terapia_intensiva"]*100)/181) < 10) %}
+                                                            background-color: #D2D2D2
+                                                        {% elif ((item["terapia_intensiva"]*100)/181)|round(1) >=10 and ((item["terapia_intensiva"]*100)/181)|round(1) < 20 %}
+                                                            background-color: yellow
+                                                        {% elif ((item["terapia_intensiva"]*100)/181)|round(1) >=20 and ((item["terapia_intensiva"]*100)/181)|round(1) < 30 %}
+                                                            background-color: #ff7514
+                                                        {% elif ((item["terapia_intensiva"]*100)/181)|round(1) >=30  %}
+                                                            background-color: red
+                                                        {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Basilicata" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/62)|round(1) }}%;
+                                                            {% if (((item["terapia_intensiva"]*100)/62) < 10) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["terapia_intensiva"]*100)/62)|round(1) >=10 and ((item["terapia_intensiva"]*100)/62)|round(1) < 20 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["terapia_intensiva"]*100)/62)|round(1) >=20 and ((item["terapia_intensiva"]*100)/62)|round(1) < 30 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["terapia_intensiva"]*100)/62)|round(1) >=30  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Calabria" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/189)|round(1) }}%;
+                                                            {% if (((item["terapia_intensiva"]*100)/189) < 10) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["terapia_intensiva"]*100)/189)|round(1) >=10 and ((item["terapia_intensiva"]*100)/189)|round(1) < 20 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["terapia_intensiva"]*100)/189)|round(1) >=20 and ((item["terapia_intensiva"]*100)/189)|round(1) < 30 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["terapia_intensiva"]*100)/189)|round(1) >=30  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Campania" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/743)|round(1) }}%;
+                                                            {% if (((item["terapia_intensiva"]*100)/743) < 10) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["terapia_intensiva"]*100)/743)|round(1) >=10 and ((item["terapia_intensiva"]*100)/743)|round(1) < 20 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["terapia_intensiva"]*100)/743)|round(1) >=20 and ((item["terapia_intensiva"]*100)/743)|round(1) < 30 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["terapia_intensiva"]*100)/743)|round(1) >=30  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Emilia-Romagna" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/889)|round(1) }}%;
+                                                            {% if (((item["terapia_intensiva"]*100)/889) < 10) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["terapia_intensiva"]*100)/889)|round(1) >=10 and ((item["terapia_intensiva"]*100)/889)|round(1) < 20 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["terapia_intensiva"]*100)/889)|round(1) >=20 and ((item["terapia_intensiva"]*100)/889)|round(1) < 30 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["terapia_intensiva"]*100)/889)|round(1) >=30  %}
+                                                                background-color: red
+                                                            {% endif %}
+
+                                                        {% elif item["denominazione_regione"] == "Friuli Venezia Giulia" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/175)|round(1) }}%;
+                                                            {% if (((item["terapia_intensiva"]*100)/175) < 15) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["terapia_intensiva"]*100)/175)|round(1) >=10 and ((item["terapia_intensiva"]*100)/175)|round(1) < 20 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["terapia_intensiva"]*100)/175)|round(1) >=20 and ((item["terapia_intensiva"]*100)/175)|round(1) < 30 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["terapia_intensiva"]*100)/175)|round(1) >=30  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Lazio" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/1186)|round(1) }}%;
+                                                            {% if (((item["terapia_intensiva"]*100)/1186) < 10) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["terapia_intensiva"]*100)/1186)|round(1) >=10 and ((item["terapia_intensiva"]*100)/1186)|round(1) < 20 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["terapia_intensiva"]*100)/1186)|round(1) >=20 and ((item["terapia_intensiva"]*100)/1186)|round(1) < 30 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["terapia_intensiva"]*100)/1186)|round(1) >=30  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Liguria" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/226)|round(1) }}%;
+                                                            {% if (((item["terapia_intensiva"]*100)/226) < 10) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["terapia_intensiva"]*100)/226)|round(1) >=10 and ((item["terapia_intensiva"]*100)/226)|round(1) < 20 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["terapia_intensiva"]*100)/226)|round(1) >=20 and ((item["terapia_intensiva"]*100)/226)|round(1) < 30 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["terapia_intensiva"]*100)/226)|round(1) >=30  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Lombardia" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/1810)|round(1) }}%;
+                                                            {% if (((item["terapia_intensiva"]*100)/1810) < 10) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["terapia_intensiva"]*100)/1810)|round(1) >=10 and ((item["terapia_intensiva"]*100)/1810)|round(1) < 20 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["terapia_intensiva"]*100)/1810)|round(1) >=20 and ((item["terapia_intensiva"]*100)/1810)|round(1) < 30 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["terapia_intensiva"]*100)/1810)|round(1) >=30  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Marche" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/256)|round(1) }}%;
+                                                            {% if (((item["terapia_intensiva"]*100)/256) < 10) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["terapia_intensiva"]*100)/256)|round(1) >=10 and ((item["terapia_intensiva"]*100)/256)|round(1) < 20 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["terapia_intensiva"]*100)/256)|round(1) >=20 and ((item["terapia_intensiva"]*100)/256)|round(1) < 30 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["terapia_intensiva"]*100)/256)|round(1) >=30  %}
+                                                                background-color: red
+                                                            {% endif %}
+
+                                                        {% elif item["denominazione_regione"] == "Molise" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/39)|round(1) }}%;
+                                                            {% if (((item["terapia_intensiva"]*100)/39) < 10) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["terapia_intensiva"]*100)/39)|round(1) >=10 and ((item["terapia_intensiva"]*100)/39)|round(1) < 20 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["terapia_intensiva"]*100)/39)|round(1) >=20 and ((item["terapia_intensiva"]*100)/39)|round(1) < 30 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["terapia_intensiva"]*100)/39)|round(1) >=30  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "P.A. Bolzano" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/100)|round(1) }}%;
+                                                            {% if (((item["terapia_intensiva"]*100)/100) < 10) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["terapia_intensiva"]*100)/100)|round(1) >=10 and ((item["terapia_intensiva"]*100)/100)|round(1) < 20 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["terapia_intensiva"]*100)/100)|round(1) >=20 and ((item["terapia_intensiva"]*100)/100)|round(1) < 30 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["terapia_intensiva"]*100)/100)|round(1) >=30  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "P.A. Trento" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/90)|round(1) }}%;
+                                                            {% if (((item["terapia_intensiva"]*100)/90) < 10) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["terapia_intensiva"]*100)/90)|round(1) >=10 and ((item["terapia_intensiva"]*100)/90)|round(1) < 20 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["terapia_intensiva"]*100)/90)|round(1) >=20 and ((item["terapia_intensiva"]*100)/90)|round(1) < 30 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["terapia_intensiva"]*100)/90)|round(1) >=30  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Piemonte" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/628)|round(1) }}%;
+                                                            {% if (((item["terapia_intensiva"]*100)/628) < 10) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["terapia_intensiva"]*100)/628)|round(1) >=10 and ((item["terapia_intensiva"]*100)/628)|round(1) < 20 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["terapia_intensiva"]*100)/628)|round(1) >=20 and ((item["terapia_intensiva"]*100)/628)|round(1) < 30 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["terapia_intensiva"]*100)/628)|round(1) >=30  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Puglia" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/528)|round(1) }}%;
+                                                            {% if (((item["terapia_intensiva"]*100)/528) < 10) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["terapia_intensiva"]*100)/528)|round(1) >=10 and ((item["terapia_intensiva"]*100)/528)|round(1) < 20 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["terapia_intensiva"]*100)/528)|round(1) >=20 and ((item["terapia_intensiva"]*100)/528)|round(1) < 30 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["terapia_intensiva"]*100)/528)|round(1) >=30  %}
+                                                                background-color: red
+                                                            {% endif %}
+
+                                                        {% elif item["denominazione_regione"] == "Sardegna" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/204)|round(1) }}%;
+                                                            {% if (((item["terapia_intensiva"]*100)/204) < 10) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["terapia_intensiva"]*100)/204)|round(1) >=10 and ((item["terapia_intensiva"]*100)/204)|round(1) < 20 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["terapia_intensiva"]*100)/204)|round(1) >=20 and ((item["terapia_intensiva"]*100)/204)|round(1) < 30 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["terapia_intensiva"]*100)/204)|round(1) >=30  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Sicilia" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/840)|round(1) }}%;
+                                                            {% if (((item["terapia_intensiva"]*100)/840) < 10) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["terapia_intensiva"]*100)/840)|round(1) >=10 and ((item["terapia_intensiva"]*100)/840)|round(1) < 20 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["terapia_intensiva"]*100)/840)|round(1) >=20 and ((item["terapia_intensiva"]*100)/840)|round(1) < 30 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["terapia_intensiva"]*100)/840)|round(1) >=30  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Toscana" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/570)|round(1) }}%;
+                                                            {% if (((item["terapia_intensiva"]*100)/570) < 10) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["terapia_intensiva"]*100)/570)|round(1) >=10 and ((item["terapia_intensiva"]*100)/570)|round(1) < 20 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["terapia_intensiva"]*100)/570)|round(1) >=20 and ((item["terapia_intensiva"]*100)/570)|round(1) < 30 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["terapia_intensiva"]*100)/570)|round(1) >=30  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Umbria" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/127)|round(1) }}%;
+                                                            {% if (((item["terapia_intensiva"]*100)/127) < 10) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["terapia_intensiva"]*100)/127)|round(1) >=10 and ((item["terapia_intensiva"]*100)/127)|round(1) < 20 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["terapia_intensiva"]*100)/127)|round(1) >=20 and ((item["terapia_intensiva"]*100)/127)|round(1) < 30 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["terapia_intensiva"]*100)/127)|round(1) >=30  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Valle d'Aosta" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/33)|round(1) }}%;
+                                                            {% if (((item["terapia_intensiva"]*100)/33) < 10) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["terapia_intensiva"]*100)/33)|round(1) >=10 and ((item["terapia_intensiva"]*100)/33)|round(1) < 20 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["terapia_intensiva"]*100)/33)|round(1) >=20 and ((item["terapia_intensiva"]*100)/33)|round(1) < 30 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["terapia_intensiva"]*100)/33)|round(1) >=30  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% elif item["denominazione_regione"] == "Veneto" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/1000)|round(1) }}%;
+                                                            {% if (((item["terapia_intensiva"]*100)/1000) < 10) %}
+                                                                background-color: #D2D2D2
+                                                            {% elif ((item["terapia_intensiva"]*100)/1000)|round(1) >=10 and ((item["terapia_intensiva"]*100)/1000)|round(1) < 20 %}
+                                                                background-color: yellow
+                                                            {% elif ((item["terapia_intensiva"]*100)/1000)|round(1) >=20 and ((item["terapia_intensiva"]*100)/1000)|round(1) < 30 %}
+                                                                background-color: #ff7514
+                                                            {% elif ((item["terapia_intensiva"]*100)/1000)|round(1) >=30  %}
+                                                                background-color: red
+                                                            {% endif %}
+                                                        {% endif %}
+                                                        " aria-valuenow="" aria-valuemin="0" aria-valuemax="100"
+
+                                                  ></div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {% if item["denominazione_regione"] == "Abruzzo" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/181)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Basilicata" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/62)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Calabria" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/189)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Campania" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/743)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Emilia-Romagna" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/889)|round(1) }}%
+
+                                                        {% elif item["denominazione_regione"] == "Friuli Venezia Giulia" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/175)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Lazio" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/1186)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Liguria" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/226)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Lombardia" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/1810)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Marche" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/256)|round(1) }}%
+
+                                                        {% elif item["denominazione_regione"] == "Molise" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/39)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "P.A. Bolzano" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/100)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "P.A. Trento" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/90)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Piemonte" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/628)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Puglia" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/528)|round(1) }}%
+
+                                                        {% elif item["denominazione_regione"] == "Sardegna" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/204)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Sicilia" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/840)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Toscana" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/570)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Umbria" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/127)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Valle d'Aosta" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/85)|round(1) }}%
+                                                        {% elif item["denominazione_regione"] == "Veneto" %}
+                                                            {{ ((item["terapia_intensiva"]*100)/1000)|round(1) }}%
+                                                        {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                        </div>
+                        <div class="col-sm-2">
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <br>
+            <br>
+            <hr>
+            <br>
+            <br>
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+
+
+
+        <script>
+        const ctx1 = document.getElementById('attualmentePositivi').getContext('2d');
+        const ctx2 = document.getElementById('AttualmentepositiviPerRegione').getContext('2d');
+        const ctx3 = document.getElementById('testMolecolari').getContext('2d');
+        const ctx4 = document.getElementById('vax').getContext('2d');
+
+
+
+        new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: [
+                        {% for item in chartData["attualmentePositivi"]["labels"] %}
+                            "{{ item }}",
+                        {% endfor %}
+                ],
+                datasets: [{
+                    label: 'Numero positivi',
+                    data: [
+                            {% for item in chartData["attualmentePositivi"]["values"] %}
+                              "{{ item }}",
+                            {% endfor %}
+                    ],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        const myChart2 = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: [
+                        {% for item in chartData["andamentoRegioniLast"]["labels"] %}
+                            "{{ item }}",
+                        {% endfor %}
+                ],
+                datasets: [{
+                    label: 'Numero positivi',
+                    data: [
+                            {% for item in chartData["andamentoRegioniLast"]["values"] %}
+                              "{{ item }}",
+                            {% endfor %}
+                    ],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        new Chart(ctx3, {
+            type: 'line',
+            data: {
+                labels: [
+                        {% for item in chartData["testMolecolare"]["labels"] %}
+                            "{{ item }}",
+                        {% endfor %}
+                ],
+                datasets: [{
+                    label: 'Persone positive al tampone molecolare',
+                    data: [{% for item in chartData["testMolecolare"]["values"]["positiviTest"] %}
+                                "{{ item }}",
+                            {% endfor %}],
+                    borderColor: "red",
+                    fill: false
+                    },{
+                        label: 'Tamponi molecolari effettuati',
+                        data: [{% for item in chartData["testMolecolare"]["values"]["TestMolecolare"] %}
+                                    "{{ item }}",
+                                {% endfor %}],
+                        borderColor: "green",
+                        fill: false
+                    }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+
+        var data = {
+            labels: [{% for item in obj["vaccini"]["data"] %}
+                                "{{ item["reg"] }}",
+                            {% endfor %}],
+            datasets: [
+                {
+                    label: "Dosi somministrate",
+                    backgroundColor: "blue",
+                    data: [{% for item in obj["vaccini"]["data"] %}
+                                "{{ item["dosi_somministrate"] }}",
+                            {% endfor %}]
+                },
+                {
+                    label: "Dosi consegnate",
+                    backgroundColor: "green",
+                    data: [{% for item in obj["vaccini"]["data"] %}
+                                "{{ item["dosi_consegnate"] }}",
+                            {% endfor %}]
+                }
+            ]
+        };
+
+        var myBarChart = new Chart(ctx4, {
+            type: 'bar',
+            data: data,
+            options: {
+                barValueSpacing: 20,
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            min: 0,
+                        }
+                    }]
+                }
+            }
+        });
+
+        </script>
+
+
+
+    </body>
+</html>
+{% endblock %}
