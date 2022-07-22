@@ -1,3 +1,3 @@
 # CovidWebSite
 
-try it on (metiupaga.pythonanywhere.com)
+try it on [metiupaga.pythonanywhere.com]
